@@ -1,114 +1,31 @@
-module Main exposing (Character, Model, Msg(..), attack, init, main, update, view)
+module Main exposing (main)
 
-import Browser
-import Html exposing (Html, button, div, li, text, ul)
-import Html.Events exposing (onClick)
-
-
-
--- MAIN
+import Array exposing (Array)
+import Dict exposing (Dict)
+import Html exposing (Html, a, div, h1, li, text, ul)
+import Html.Attributes exposing (href)
+import Set exposing (Set)
 
 
+main : Html msg
 main =
-    Browser.sandbox { init = init, update = update, view = view }
+    div [] [ header, content ]
 
 
-type alias Model =
-    { wai : Character
-    , teki : Character
-    }
+header : Html msg
+header =
+    h1 [] [ text "Useful Links" ]
 
 
-type alias Character =
-    { name : String
-    , hp : Int
-    , lightAttackPoint : Int
-    , strongAttackPoint : Int
-    }
-
-
-init : Model
-init =
-    { wai =
-        { name = "ワイ"
-        , hp = 1000
-        , lightAttackPoint = 20
-        , strongAttackPoint = 50
-        }
-    , teki =
-        { name = "テキ"
-        , hp = 2000
-        , lightAttackPoint = 5
-        , strongAttackPoint = 30
-        }
-    }
-
-
-type Msg
-    = WaiAttack Int
-    | TekiAttack Int
-    | Reset
-
-
-update : Msg -> Model -> Model
-update msg model =
-    case msg of
-        WaiAttack num ->
-            let
-                attackedTeki =
-                    if num == 1 then
-                        attack model.teki model.wai.lightAttackPoint
-
-                    else
-                        attack model.teki model.wai.strongAttackPoint
-            in
-            { model | teki = attackedTeki }
-
-        TekiAttack num ->
-            let
-                attackedWai =
-                    if num == 1 then
-                        attack model.wai model.teki.lightAttackPoint
-
-                    else
-                        attack model.wai model.teki.strongAttackPoint
-            in
-            { model | wai = attackedWai }
-
-        Reset ->
-            init
-
-
-view : Model -> Html Msg
-view model =
-    div []
-        [ ul []
-            [ li []
-                [ div [] [ text model.wai.name ]
-                , div [] [ text ("HP: " ++ String.fromInt model.wai.hp) ]
-                , button [ onClick (WaiAttack 1) ] [ text "弱攻撃" ]
-                , button [ onClick (WaiAttack 2) ] [ text "強攻撃" ]
-                ]
-            , li []
-                [ div [] [ text model.teki.name ]
-                , div [] [ text ("HP: " ++ String.fromInt model.teki.hp) ]
-                , button [ onClick (TekiAttack 1) ] [ text "弱攻撃" ]
-                , button [ onClick (TekiAttack 2) ] [ text "強攻撃" ]
-                ]
-            ]
-        , div []
-            [ button [ onClick Reset ] [ text "リセット" ] ]
+content : Html msg
+content =
+    ul []
+        [ linkItem "https://elm-lang.org" "Homepage"
+        , linkItem "https://package.elm-lang.org" "Pachages"
+        , linkItem "https://ellie-app.com" "Playground"
         ]
 
 
-attack : Character -> Int -> Character
-attack character damage =
-    let
-        newHp =
-            if character.hp > damage then
-                character.hp - damage
-
-            else
-                0
-    in
-    { character | hp = newHp }
+linkItem : String -> String -> Html msg
+linkItem url text_ =
+    li [] [ a [ href url ] [ text text_ ] ]
